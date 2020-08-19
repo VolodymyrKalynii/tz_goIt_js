@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>js task 3</title>
+    <meta charset="utf-8"/>
+    <link rel="stylesheet" href="https://s.electerious.com/basicLightbox/dist/basicLightbox.min.css">
+    <style>
+        .list {
+            display: flex;
+            list-style: none;
+            flex-wrap: wrap;
+            padding: 0;
+        }
+
+        .list__item {
+            max-width: 30%;
+            width: 30%;
+            height: 200px;
+            overflow: hidden;
+            border: 1px solid;
+            margin: 10px;
+            cursor: pointer;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<h1>task3</h1>
+<a href="./index.html">task1</a>
+<a href="./task2.html">task2</a>
+
+<form id="search-form">
+    <input
+            type="text"
+            name="query"
+            id="input"
+            autocomplete="off"
+            placeholder="Search images..."
+    />
+    <button id="js-button">search</button>
+
+</form>
+<ul id="js-list" class="list">
+
+</ul>
+<script src="https://s.electerious.com/basicLightbox/dist/basicLightbox.min.js"></script>
+<script>
+    // близько 2-х годин
+    const button = document.querySelector("#js-button");
+    const input = document.querySelector("#input");
+    const list = document.querySelector("#js-list");
+
+    const imgClassName = 'js-img';
+    const apiKey = '17912975-c298c62de67e83415b929c51e';
+
+    list.addEventListener('click', (e) => {
+        const {target} = e;
+
+        if (target.classList.contains(imgClassName)) {
+            const largeImageURL = target.getAttribute('data-source');
+
+            showModal(largeImageURL);
+        }
+    });
+
+    const showModal = (largeImageURL) => {
+        basicLightbox.create(`<img width="1400" height="900" src=${largeImageURL}>`).show()
+    };
+
+    let text = ''
+    button.addEventListener('click', () => {
+        text = input.value;
+        button.setAttribute('disabled','disabled');
+        makeReq();
+    });
+
+    let page = 1;
+    let allowLoad = true;
+
+    const makeReq = () => {
+        if (!allowLoad) return false;
+        allowLoad = false;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `https://pixabay.com/api/?key=${apiKey}&q=${text}&image_type=photo&page=${page}`);
+        xhr.send();
+
+        xhr.onload = () => {
+            if (xhr.status !== 200) {
+                console.log(`Error ${xhr.status}: ${xhr.statusText}`);
+            } else {
+                const parsed = JSON.parse(xhr.response);
+                const {hits} = parsed;
+
+                page++;
+
+                buildList(hits);
+
+                allowLoad = true;
+            }
+        };
+    };
+
+    const buildList = (hits) => {
+        hits.forEach(item => {
+            const {webformatURL, id, largeImageURL} = item;
+            const LI = document.createElement('li');
+            LI.classList.add('list__item');
+            LI.innerHTML = `<img class=${imgClassName} src=${webformatURL} data-source=${largeImageURL} alt=${id}>`
+
+            list.append(LI);
+        });
+    };
+
+    window.addEventListener("scroll", function () {
+        const contentHeight = list.offsetHeight;
+        const yOffset = window.pageYOffset;
+        const window_height = window.innerHeight;
+        const y = yOffset + window_height;
+
+        if (y >= contentHeight) {
+            makeReq();
+        }
+    });
+</script>
+
+
+
+<!--    <div id="controls">-->
+<!--      <input-->
+<!--        type="number"-->
+<!--        id="input"-->
+<!--        min="0"-->
+<!--        max="100"-->
+<!--        step="1"-->
+<!--        class="js-input"-->
+<!--      />-->
+<!--      <button type="button" id="js-create" data-action="create">Создать</button>-->
+
+<!--      <button type="button" id="js-destroy" data-action="destroy">-->
+<!--        Очистить-->
+<!--      </button>-->
+<!--    </div>-->
+<!--    <div id="js-boxes"></div>-->
+<!--	<script>-->
+<!--		// const input = document.querySelector("#input");-->
+<!--const createButton = document.querySelector("#js-create");-->
+<!--// const destroyButton = document.querySelector("#js-destroy");-->
+<!--const boxes = document.querySelector("#js-boxes");-->
+
+<!--const startSize = 30;-->
+<!--const stepSize = 10;-->
+<!--let index = 0;-->
+<!--const addHandler = () => {-->
+<!--  const div = document.createElement("DIV");-->
+
+<!--  div.style.width = index * stepSize + startSize;-->
+<!--  div.style.height = index * stepSize + startSize;-->
+
+<!--  div.style.backgroundColor =-->
+<!--    "#" + (Math.random().toString(16) + "000000").substring(2, 8).toUpperCase();-->
+
+<!--  boxes.append(div);-->
+<!--};-->
+
+<!--console.log(createButton);-->
+
+<!--createButton.addEventListener("click", addHandler);	-->
+<!--		-->
+<!--	</script>-->
+
+
+</body>
+</html>

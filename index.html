@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>js task 1</title>
+    <meta charset="utf-8"/>
+</head>
+<body>
+<h1>task1</h1>
+
+<a href="./task2.html">task2</a>
+<a href="./task3.html">task3</a>
+<p id="js-text"></p>
+<script>
+    class StringBuilder {
+      _value = '';
+
+      constructor(baseString) {
+        this._value = baseString;
+      }
+
+      append(str) {
+        this._value = this._value + str;
+
+        return this;
+      }
+
+      prepend(str) {
+        this._value = str + this._value;
+
+        return this;
+      }
+
+      pad(str) {
+        this.prepend(str);
+        this.append(str);
+
+        return this;
+      }
+
+      getValue() {
+        return this._value;
+      }
+    }
+
+    const builder = new StringBuilder(".");
+
+    builder.append("^").prepend("^").pad("=");
+    const value = builder.getValue();
+
+    console.log(value);
+    document.querySelector('#js-text').append(value);
+</script>
+
+
+</body>
+</html>
